@@ -1,3 +1,3 @@
-module icinga-check-nomad-job
+module bitbucket.org/sabio-it/icinga-check-nomad-job
 
-go 1.15
+go 1.13
