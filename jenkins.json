@@ -2,7 +2,7 @@
     "nexus-artifact": {
         "type": "raw",
         "directory": "de/sabio/icinga-check-nomad-job",
-        "filename": "check-nomad-job",
+        "filename": "cmd",
         "version": "0.0.1",
         "flags-package": "cmd"
     },
