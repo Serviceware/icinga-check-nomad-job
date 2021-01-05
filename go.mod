@@ -1,0 +1,1 @@
+module "icinga-check-nomad-job"
