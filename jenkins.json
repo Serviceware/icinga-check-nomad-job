@@ -5,7 +5,7 @@
         "filename": "check-nomad-job",
         "version": "0.0.4",
         "flags-package": "cmd",
-        "mainfile": "cmd"
+        "mainfile": "cmd/CheckNomadJob.go"
     },
     "os-targets": [ "linux", "darwin", "windows" ],
     "runTests": false
