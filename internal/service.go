@@ -68,7 +68,7 @@ func (c *ServiceCheck) printJobInfo() {
 }
 
 func (c *ServiceCheck) createJobLink() string {
-	link := fmt.Sprintf("%s/ui/jobs/%s\n", c.Client.Address(), *c.jobInfo.ID)
+	link := fmt.Sprintf("%s/ui/jobs/%s", c.Client.Address(), *c.jobInfo.ID)
 
-	return "<a href='" + link + "'>" + link + "</a>"
+	return "<a href=\"" + link + "\" target=\"_blank\">" + link + "</a>"
 }
