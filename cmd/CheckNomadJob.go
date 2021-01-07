@@ -100,12 +100,14 @@ func checkSystem() {
 	}
 
 	if pluginInfo.NodesHealthy == 0 {
-		fmt.Printf("nodes-healthy=0 nodes-expected=%d\n", pluginInfo.NodesExpected)
+		fmt.Printf("nodes-healthy  = 0\n")
+		fmt.Printf("nodes-expected = %d\n", pluginInfo.NodesExpected)
 		os.Exit(2)
 	}
 
 	if pluginInfo.NodesExpected != pluginInfo.NodesHealthy {
-		fmt.Printf("nodes-healthy=%d nodes-expected=%d\n", pluginInfo.NodesHealthy, pluginInfo.NodesExpected)
+		fmt.Printf("nodes-healthy  = %d\n", pluginInfo.NodesHealthy)
+		fmt.Printf("nodes-expected = %d\n", pluginInfo.NodesExpected)
 		os.Exit(1)
 	}
 
