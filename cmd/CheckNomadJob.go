@@ -1,57 +1,53 @@
 package main
 
 import (
-	"flag"
 	nomad "github.com/hashicorp/nomad/api"
+	"github.com/jessevdk/go-flags"
 	"log"
 	"os"
 )
 
-var (
-	address    string
-	caCert     string
-	clientCert string
-	clientKey  string
+var opts struct{
+	Address string `long:"address" description:"Address of the nomad server"`
 
-	job     string
-	jobType string
-)
+	CaCert     string `long:"ca" description:"Path to ca cert"`
+	ClientCert string `long:"cert" description:"Path to client cert"`
+	ClientKey  string `long:"key" description:"Path to client key"`
+
+	Job     string `short:"j" long:"job" description:"Job to check"`
+	JobType string `short:"t" long:"type" description:"Type of the job (service, csi-plugin)"`
+}
 
 func main() {
 	parseFlags()
 
-	switch jobType {
+	switch opts.JobType {
 	case "service":
 		checkService()
 	case "csi-plugin":
 		checkSystem()
 	default:
-		println("job type '", jobType, "' not supported")
+		println("job type '", opts.JobType, "' not supported")
 	}
 }
 
 func parseFlags() {
-	flag.StringVar(&address, "address", "", "Address of nomad server")
+	_, err := flags.Parse(&opts)
 
-	flag.StringVar(&caCert, "ca-cert", "", "Path to ca cert")
-	flag.StringVar(&clientCert, "client-cert", "", "Path to client cert")
-	flag.StringVar(&clientKey, "client-key", "", "Path to client key")
-
-	flag.StringVar(&job, "job", "", "The nomad job to check")
-	flag.StringVar(&jobType, "type", "service", "The type of the job (service, csi-plugin)")
-
-	flag.Parse()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
 
 func nomadClient() *nomad.Client {
 	tlsConfig := &nomad.TLSConfig{
-		CACert:     caCert,
-		ClientCert: clientCert,
-		ClientKey:  clientKey,
+		CACert:     opts.CaCert,
+		ClientCert: opts.ClientCert,
+		ClientKey:  opts.ClientKey,
 		Insecure:   false,
 	}
 
-	config := &nomad.Config{Address: address, TLSConfig: tlsConfig}
+	config := &nomad.Config{Address: opts.Address, TLSConfig: tlsConfig}
 	client, err := nomad.NewClient(config)
 
 	if err != nil {
@@ -64,7 +60,7 @@ func nomadClient() *nomad.Client {
 func checkService() {
 	client := nomadClient()
 
-	jobInfo, _, err := client.Jobs().Info(job, &nomad.QueryOptions{})
+	jobInfo, _, err := client.Jobs().Info(opts.Job, &nomad.QueryOptions{})
 
 	if err != nil {
 		println(err.Error())
@@ -72,7 +68,7 @@ func checkService() {
 	}
 
 	if jobInfo == nil {
-		println("job '", job, "' not found")
+		println("job '", opts.Job, "' not found")
 		os.Exit(3)
 	}
 
@@ -96,7 +92,7 @@ func checkSystem() {
 	client := nomadClient()
 
 	//jobInfo, _, err := client.Jobs().Info(job, &nomad.QueryOptions{})
-	pluginInfo, _, err := client.CSIPlugins().Info(job, &nomad.QueryOptions{})
+	pluginInfo, _, err := client.CSIPlugins().Info(opts.Job, &nomad.QueryOptions{})
 
 	if err != nil {
 		println(err.Error())

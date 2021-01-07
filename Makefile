@@ -8,4 +8,4 @@ test-patty:
 	go build -o test/check-nomad-job cmd/CheckNomadJob.go
 	cd test; \
 	(cd patty; certdeployer certdeployer.json); \
-	./check-nomad-job -job=swops-plugin-csi-gluster -type=csi-plugin -address="https://nomad01.patty-production.awseuc1.swops.cloud:4646" -ca-cert=patty/ca.pem -client-cert=patty/cert.pem -client-key=patty/key.pem
+	./check-nomad-job -j swops-plugin-csi-gluster -t service --address "https://nomad01.patty-production.awseuc1.swops.cloud:4646" --ca patty/ca.pem --cert patty/cert.pem --key patty/key.pem
