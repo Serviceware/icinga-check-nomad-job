@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
+	"strconv"
 	"strings"
 )
 
@@ -56,7 +57,7 @@ func (c *ServiceCheck) printJobInfo() {
 	println("status=" + *c.jobInfo.Status)
 
 	for key, value := range c.deployment.TaskGroups {
-		println(key + ".unhealthyAllocs=" + string(rune(value.UnhealthyAllocs)))
+		println(key + ".unhealthyAllocs=" + strconv.Itoa(value.UnhealthyAllocs))
 	}
 
 	println(c.createJobLink())

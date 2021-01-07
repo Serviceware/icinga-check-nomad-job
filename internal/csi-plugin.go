@@ -2,6 +2,7 @@ package internal
 
 import (
 	nomad "github.com/hashicorp/nomad/api"
+	"strconv"
 )
 
 type CsiPluginCheck struct {
@@ -34,6 +35,6 @@ func (c *CsiPluginCheck) determineStatus(pluginInfo *nomad.CSIPlugin) int {
 }
 
 func (c *CsiPluginCheck) printPluginStatus(pluginInfo *nomad.CSIPlugin) {
-	println("nodes-healthy  = " + string(rune(pluginInfo.NodesHealthy)))
-	println("nodes-expected = " + string(rune(pluginInfo.NodesExpected)))
+	println("nodes-healthy  = " + strconv.Itoa(pluginInfo.NodesHealthy))
+	println("nodes-expected = " + strconv.Itoa(pluginInfo.NodesExpected))
 }
