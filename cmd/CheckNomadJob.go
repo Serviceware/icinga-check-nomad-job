@@ -19,11 +19,8 @@ var opts struct {
 	JobType string `short:"t" long:"type" description:"Type of the job (service, csi-plugin)"`
 }
 
-var client *nomad.Client
-
 func main() {
 	parseFlags()
-	client = nomadClient()
 
 	switch opts.JobType {
 	case "service":
@@ -63,7 +60,7 @@ func nomadClient() *nomad.Client {
 
 func checkService() {
 	serviceCheck := internal.ServiceCheck{
-		Client: client,
+		Client: nomadClient(),
 		Job:    opts.Job,
 	}
 
@@ -72,7 +69,7 @@ func checkService() {
 
 func checkCsiPlugin() {
 	pluginCheck := internal.CsiPluginCheck{
-		Client: client,
+		Client: nomadClient(),
 		Job:    opts.Job,
 	}
 	os.Exit(pluginCheck.Check())
