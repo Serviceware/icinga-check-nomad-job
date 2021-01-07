@@ -7,6 +7,6 @@
         "flags-package": "cmd",
         "mainfile": "cmd/CheckNomadJob.go"
     },
-    "os-targets": [ "linux", "darwin", "windows" ],
+    "os-targets": [ "linux" ],
     "runTests": false
 }
