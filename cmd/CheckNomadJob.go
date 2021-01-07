@@ -2,7 +2,6 @@ package main
 
 import (
 	"bitbucket.org/sabio-it/icinga-check-nomad-job/internal"
-	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
 	"github.com/jessevdk/go-flags"
 	"log"
@@ -30,7 +29,7 @@ func main() {
 	case "service":
 		checkService()
 	case "csi-plugin":
-		checkSystem()
+		checkCsiPlugin()
 	default:
 		println("job type '", opts.JobType, "' not supported")
 	}
@@ -63,32 +62,18 @@ func nomadClient() *nomad.Client {
 }
 
 func checkService() {
+	serviceCheck := internal.ServiceCheck{
+		Client: client,
+		Job:    opts.Job,
+	}
+
+	os.Exit(serviceCheck.Check())
 }
 
-func TestMe() {}
-
-func checkSystem() {
-	pluginInfo, _, err := client.CSIPlugins().Info(opts.Job, &nomad.QueryOptions{})
-
-	if err != nil {
-		println(err.Error())
-		os.Exit(2)
+func checkCsiPlugin() {
+	pluginCheck := internal.CsiPluginCheck{
+		Client: client,
+		Job:    opts.Job,
 	}
-
-	printPluginStatus(pluginInfo)
-
-	if pluginInfo.NodesHealthy == 0 {
-		os.Exit(2)
-	}
-
-	if pluginInfo.NodesExpected != pluginInfo.NodesHealthy {
-		os.Exit(1)
-	}
-
-	os.Exit(0)
-}
-
-func printPluginStatus(pluginInfo *nomad.CSIPlugin) {
-	fmt.Printf("nodes-healthy  = %d\n", pluginInfo.NodesHealthy)
-	fmt.Printf("nodes-expected = %d\n", pluginInfo.NodesExpected)
+	os.Exit(pluginCheck.Check())
 }
