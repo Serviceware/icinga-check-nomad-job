@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
 	"github.com/jessevdk/go-flags"
 	"log"
 	"os"
 )
 
-var opts struct{
+var opts struct {
 	Address string `long:"address" description:"Address of the nomad server"`
 
 	CaCert     string `long:"ca" description:"Path to ca cert"`
@@ -91,21 +92,20 @@ func checkService() {
 func checkSystem() {
 	client := nomadClient()
 
-	//jobInfo, _, err := client.Jobs().Info(job, &nomad.QueryOptions{})
 	pluginInfo, _, err := client.CSIPlugins().Info(opts.Job, &nomad.QueryOptions{})
 
 	if err != nil {
 		println(err.Error())
-		os.Exit(3)
+		os.Exit(2)
 	}
 
 	if pluginInfo.NodesHealthy == 0 {
-		println("nodes-healthy=0")
+		fmt.Printf("nodes-healthy=0 nodes-expected=%d\n", pluginInfo.NodesExpected)
 		os.Exit(2)
 	}
 
 	if pluginInfo.NodesExpected != pluginInfo.NodesHealthy {
-		println("nodes-healthy=", pluginInfo.NodesHealthy)
+		fmt.Printf("nodes-healthy=%d nodes-expected=%d\n", pluginInfo.NodesHealthy, pluginInfo.NodesExpected)
 		os.Exit(1)
 	}
 
