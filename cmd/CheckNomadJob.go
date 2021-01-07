@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bitbucket.org/sabio-it/icinga-check-nomad-job/internal"
 	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
 	"github.com/jessevdk/go-flags"
@@ -19,8 +20,11 @@ var opts struct {
 	JobType string `short:"t" long:"type" description:"Type of the job (service, csi-plugin)"`
 }
 
+var client *nomad.Client
+
 func main() {
 	parseFlags()
+	client = nomadClient()
 
 	switch opts.JobType {
 	case "service":
@@ -59,39 +63,11 @@ func nomadClient() *nomad.Client {
 }
 
 func checkService() {
-	client := nomadClient()
-
-	jobInfo, _, err := client.Jobs().Info(opts.Job, &nomad.QueryOptions{})
-
-	if err != nil {
-		println(err.Error())
-		os.Exit(3)
-	}
-
-	if jobInfo == nil {
-		println("job '", opts.Job, "' not found")
-		os.Exit(3)
-	}
-
-	switch *jobInfo.Status {
-	case "running":
-		println("status=running")
-		os.Exit(0)
-	case "pending":
-		println("status=pending")
-		os.Exit(1)
-	case "dead":
-		println("status=dead")
-		os.Exit(2)
-	default:
-		println("unhandled status '", *jobInfo.Status, "'")
-		os.Exit(3)
-	}
 }
 
-func checkSystem() {
-	client := nomadClient()
+func TestMe() {}
 
+func checkSystem() {
 	pluginInfo, _, err := client.CSIPlugins().Info(opts.Job, &nomad.QueryOptions{})
 
 	if err != nil {
@@ -99,17 +75,20 @@ func checkSystem() {
 		os.Exit(2)
 	}
 
+	printPluginStatus(pluginInfo)
+
 	if pluginInfo.NodesHealthy == 0 {
-		fmt.Printf("nodes-healthy  = 0\n")
-		fmt.Printf("nodes-expected = %d\n", pluginInfo.NodesExpected)
 		os.Exit(2)
 	}
 
 	if pluginInfo.NodesExpected != pluginInfo.NodesHealthy {
-		fmt.Printf("nodes-healthy  = %d\n", pluginInfo.NodesHealthy)
-		fmt.Printf("nodes-expected = %d\n", pluginInfo.NodesExpected)
 		os.Exit(1)
 	}
 
 	os.Exit(0)
+}
+
+func printPluginStatus(pluginInfo *nomad.CSIPlugin) {
+	fmt.Printf("nodes-healthy  = %d\n", pluginInfo.NodesHealthy)
+	fmt.Printf("nodes-expected = %d\n", pluginInfo.NodesExpected)
 }
