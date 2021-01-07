@@ -3,7 +3,7 @@
         "type": "raw",
         "directory": "de/sabio/icinga-check-nomad-job",
         "filename": "check-nomad-job",
-        "version": "0.0.6",
+        "version": "0.0.7",
         "flags-package": "cmd",
         "mainfile": "cmd/CheckNomadJob.go"
     },
