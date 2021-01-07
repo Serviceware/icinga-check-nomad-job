@@ -1,0 +1,18 @@
+{
+  "vault_address": "https://vault01.vault.hetz.sabio.de:8200",
+  "authentication": {
+    "mode": "user"
+  },
+
+  "pki_backend": "nomad-internal",
+  "role": "cli",
+  "attributes": {
+    "common_name": "cli"
+  },
+
+  "destination": {
+    "ca_file": "ca.pem",
+    "certificate_file": "cert.pem",
+    "key_file": "key.pem"
+  }
+}
