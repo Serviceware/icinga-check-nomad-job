@@ -1,8 +1,8 @@
 package internal
 
 import (
+	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
-	"log"
 	"strings"
 )
 
@@ -53,16 +53,22 @@ func (c *ServiceCheck) determineStatus() int {
 }
 
 func (c *ServiceCheck) printJobInfo() {
-	log.Printf("%s/ui/jobs/%s\n", c.Client.Address(), *c.jobInfo.ID)
-	for key, value := range c.jobInfo.Meta {
-		if strings.HasPrefix(key, "OWNER") {
-			log.Printf("owner=%s\n", value)
-		}
-	}
-	log.Println()
-	log.Printf("status=%s\n", *c.jobInfo.Status)
+	println("status=" + *c.jobInfo.Status)
 
 	for key, value := range c.deployment.TaskGroups {
-		log.Printf("%s.unhealthyAllocs=%d", key, value.UnhealthyAllocs)
+		println(key + ".unhealthyAllocs=" + string(rune(value.UnhealthyAllocs)))
 	}
+
+	println(c.createJobLink())
+	for key, value := range c.jobInfo.Meta {
+		if strings.HasPrefix(key, "OWNER") {
+			println("owner=" + value)
+		}
+	}
+}
+
+func (c *ServiceCheck) createJobLink() string {
+	link := fmt.Sprintf("%s/ui/jobs/%s\n", c.Client.Address(), *c.jobInfo.ID)
+
+	return "<a href='" + link + "'>" + link + "</a>"
 }

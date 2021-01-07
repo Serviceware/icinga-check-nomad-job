@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
 )
 
@@ -35,6 +34,6 @@ func (c *CsiPluginCheck) determineStatus(pluginInfo *nomad.CSIPlugin) int {
 }
 
 func (c *CsiPluginCheck) printPluginStatus(pluginInfo *nomad.CSIPlugin) {
-	fmt.Printf("nodes-healthy  = %d\n", pluginInfo.NodesHealthy)
-	fmt.Printf("nodes-expected = %d\n", pluginInfo.NodesExpected)
+	println("nodes-healthy  = " + string(rune(pluginInfo.NodesHealthy)))
+	println("nodes-expected = " + string(rune(pluginInfo.NodesExpected)))
 }
