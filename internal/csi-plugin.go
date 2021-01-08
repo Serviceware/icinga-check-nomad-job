@@ -17,7 +17,7 @@ func NewCsiPluginCheck(client *nomad.Client, job string, plugin string) Check {
 }
 
 func (c *CsiPluginCheck) DoCheck() int {
-	pluginInfo, _, err := c.client.CSIPlugins().Info(c.job, &nomad.QueryOptions{})
+	pluginInfo, _, err := c.client.CSIPlugins().Info(c.plugin, &nomad.QueryOptions{})
 
 	if err != nil {
 		println(err.Error())

@@ -43,3 +43,11 @@ func TestLegacyServiceUnkown(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestLegacyPlugin(t *testing.T) {
+	status := internal.NewCsiPluginCheck(legacyClient(), "gluster-csi-plugin", "csi.serviceware.gluster").DoCheck()
+
+	if status != 0 {
+		t.Fail()
+	}
+}
