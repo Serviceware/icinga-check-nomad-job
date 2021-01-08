@@ -43,7 +43,7 @@ func (c *CsiPluginCheck) determineStatus(pluginInfo *nomad.CSIPlugin) int {
 func (c *CsiPluginCheck) printPluginStatus(pluginInfo *nomad.CSIPlugin) {
 	healthyNodes := strconv.Itoa(pluginInfo.NodesHealthy)
 	expectedNodes := strconv.Itoa(pluginInfo.NodesExpected)
-	println(healthyNodes + " out of " + expectedNodes + " available")
+	println(healthyNodes + " out of " + expectedNodes + " nodes available")
 	println()
 	println(c.createJobLink())
 }
