@@ -29,12 +29,7 @@ func gretaClient() *nomad.Client {
 }
 
 func TestGretaService(t *testing.T) {
-	serviceCheck := internal.ServiceCheck{
-		Client: gretaClient(),
-		Job:    "internal-nexus",
-	}
-
-	status := serviceCheck.Check()
+	status := internal.NewServiceCheck(gretaClient(), "internal-nexus").DoCheck()
 
 	if status != 0 {
 		t.Fail()
@@ -42,12 +37,7 @@ func TestGretaService(t *testing.T) {
 }
 
 func TestGretaServiceUnkown(t *testing.T) {
-	serviceCheck := internal.ServiceCheck{
-		Client: gretaClient(),
-		Job:    "some-not-existing-job",
-	}
-
-	status := serviceCheck.Check()
+	status := internal.NewServiceCheck(gretaClient(), "some-non-existing-job").DoCheck()
 
 	if status != 3 {
 		t.Fail()

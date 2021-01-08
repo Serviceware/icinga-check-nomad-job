@@ -8,15 +8,22 @@ import (
 )
 
 type ServiceCheck struct {
-	Client *nomad.Client
-	Job    string
+	client *nomad.Client
+	job    string
 
 	jobInfo    *nomad.Job
 	deployment *nomad.Deployment
 }
 
-func (c *ServiceCheck) Check() int {
-	jobInfo, _, err := c.Client.Jobs().Info(c.Job, &nomad.QueryOptions{})
+func NewServiceCheck(client *nomad.Client, job string) Check {
+	return &ServiceCheck{
+		client: client,
+		job:    job,
+	}
+}
+
+func (c *ServiceCheck) DoCheck() int {
+	jobInfo, _, err := c.client.Jobs().Info(c.job, &nomad.QueryOptions{})
 
 	if err != nil {
 		println(err.Error())
@@ -24,12 +31,12 @@ func (c *ServiceCheck) Check() int {
 	}
 
 	if jobInfo == nil {
-		println("job '", c.Job, "' not found")
+		println("job '", c.job, "' not found")
 		return 3
 	}
 
 	c.jobInfo = jobInfo
-	c.deployment, _, _ = c.Client.Jobs().LatestDeployment(*jobInfo.ID, &nomad.QueryOptions{})
+	c.deployment, _, _ = c.client.Jobs().LatestDeployment(*jobInfo.ID, &nomad.QueryOptions{})
 
 	if c.deployment == nil {
 		c.deployment = &nomad.Deployment{}
@@ -69,7 +76,7 @@ func (c *ServiceCheck) printJobInfo() {
 }
 
 func (c *ServiceCheck) createJobLink() string {
-	link := fmt.Sprintf("%s/ui/jobs/%s", c.Client.Address(), *c.jobInfo.ID)
+	link := fmt.Sprintf("%s/ui/jobs/%s", c.client.Address(), *c.jobInfo.ID)
 
 	return "<a href=\"" + link + "\" target=\"_blank\">" + link + "</a>"
 }

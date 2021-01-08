@@ -1,17 +1,23 @@
 package internal
 
 import (
+	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
 	"strconv"
 )
 
 type CsiPluginCheck struct {
-	Client *nomad.Client
-	Job    string
+	client *nomad.Client
+	job    string
+	plugin string
 }
 
-func (c *CsiPluginCheck) Check() int {
-	pluginInfo, _, err := c.Client.CSIPlugins().Info(c.Job, &nomad.QueryOptions{})
+func NewCsiPluginCheck(client *nomad.Client, job string, plugin string) Check {
+	return &CsiPluginCheck{client: client, job: job, plugin: plugin}
+}
+
+func (c *CsiPluginCheck) DoCheck() int {
+	pluginInfo, _, err := c.client.CSIPlugins().Info(c.job, &nomad.QueryOptions{})
 
 	if err != nil {
 		println(err.Error())
@@ -35,6 +41,15 @@ func (c *CsiPluginCheck) determineStatus(pluginInfo *nomad.CSIPlugin) int {
 }
 
 func (c *CsiPluginCheck) printPluginStatus(pluginInfo *nomad.CSIPlugin) {
-	println("nodes-healthy  = " + strconv.Itoa(pluginInfo.NodesHealthy))
-	println("nodes-expected = " + strconv.Itoa(pluginInfo.NodesExpected))
+	healthyNodes := strconv.Itoa(pluginInfo.NodesHealthy)
+	expectedNodes := strconv.Itoa(pluginInfo.NodesExpected)
+	println(healthyNodes + " out of " + expectedNodes + " available")
+	println()
+	println(c.createJobLink())
+}
+
+func (c *CsiPluginCheck) createJobLink() string {
+	link := fmt.Sprintf("%s/ui/jobs/%s", c.client.Address(), c.job)
+
+	return "<a href=\"" + link + "\" target=\"_blank\">" + link + "</a>"
 }

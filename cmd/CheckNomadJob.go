@@ -17,19 +17,23 @@ var opts struct {
 
 	Job     string `short:"j" long:"job" description:"Job to check"`
 	JobType string `short:"t" long:"type" description:"Type of the job (service, csi-plugin)"`
+	Plugin  string `short:"p" long:"plugin" description:"The plugin to check"`
 }
 
 func main() {
 	parseFlags()
 
+	exitCode := 3
 	switch opts.JobType {
 	case "service":
-		checkService()
+		exitCode = internal.NewServiceCheck(nomadClient(), opts.Job).DoCheck()
 	case "csi-plugin":
-		checkCsiPlugin()
+		exitCode = internal.NewCsiPluginCheck(nomadClient(), opts.Job, opts.Plugin).DoCheck()
 	default:
 		println("job type '", opts.JobType, "' not supported")
 	}
+
+	os.Exit(exitCode)
 }
 
 func parseFlags() {
@@ -56,21 +60,4 @@ func nomadClient() *nomad.Client {
 	}
 
 	return client
-}
-
-func checkService() {
-	serviceCheck := internal.ServiceCheck{
-		Client: nomadClient(),
-		Job:    opts.Job,
-	}
-
-	os.Exit(serviceCheck.Check())
-}
-
-func checkCsiPlugin() {
-	pluginCheck := internal.CsiPluginCheck{
-		Client: nomadClient(),
-		Job:    opts.Job,
-	}
-	os.Exit(pluginCheck.Check())
 }

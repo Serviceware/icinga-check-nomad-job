@@ -29,12 +29,7 @@ func legacyClient() *nomad.Client {
 }
 
 func TestLegacyService(t *testing.T) {
-	serviceCheck := internal.ServiceCheck{
-		Client: legacyClient(),
-		Job:    "internal-registry-cleanup-cd-images",
-	}
-
-	status := serviceCheck.Check()
+	status := internal.NewServiceCheck(legacyClient(), "internal-registry-cleanup-cd-images").DoCheck()
 
 	if status != 0 {
 		t.Fail()
@@ -42,12 +37,7 @@ func TestLegacyService(t *testing.T) {
 }
 
 func TestLegacyServiceUnkown(t *testing.T) {
-	serviceCheck := internal.ServiceCheck{
-		Client: legacyClient(),
-		Job:    "some-not-existing-job",
-	}
-
-	status := serviceCheck.Check()
+	status := internal.NewServiceCheck(legacyClient(), "some-non-existing-job").DoCheck()
 
 	if status != 3 {
 		t.Fail()
