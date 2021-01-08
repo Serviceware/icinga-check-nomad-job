@@ -26,12 +26,12 @@ func (c *ServiceCheck) DoCheck() int {
 	jobInfo, _, err := c.client.Jobs().Info(c.job, &nomad.QueryOptions{})
 
 	if err != nil {
-		println(err.Error())
-		return 3
-	}
+		if strings.Contains(err.Error(), "404") {
+			println("job '", c.job, "' not found")
+			return 2
+		}
 
-	if jobInfo == nil {
-		println("job '", c.job, "' not found")
+		println(err.Error())
 		return 3
 	}
 

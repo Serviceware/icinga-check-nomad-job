@@ -4,6 +4,7 @@ import (
 	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
 	"strconv"
+	"strings"
 )
 
 type CsiPluginCheck struct {
@@ -20,8 +21,13 @@ func (c *CsiPluginCheck) DoCheck() int {
 	pluginInfo, _, err := c.client.CSIPlugins().Info(c.plugin, &nomad.QueryOptions{})
 
 	if err != nil {
+		if strings.Contains(err.Error(), "404") {
+			println("plugin '", c.plugin, "' not found")
+			return 2
+		}
+
 		println(err.Error())
-		return 2
+		return 3
 	}
 
 	c.printPluginStatus(pluginInfo)

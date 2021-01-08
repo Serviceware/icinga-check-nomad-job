@@ -39,7 +39,7 @@ func TestLegacyService(t *testing.T) {
 func TestLegacyServiceUnkown(t *testing.T) {
 	status := internal.NewServiceCheck(legacyClient(), "some-non-existing-job").DoCheck()
 
-	if status != 3 {
+	if status != 2 {
 		t.Fail()
 	}
 }
@@ -48,6 +48,14 @@ func TestLegacyPlugin(t *testing.T) {
 	status := internal.NewCsiPluginCheck(legacyClient(), "gluster-csi-plugin", "csi.serviceware.gluster").DoCheck()
 
 	if status != 0 {
+		t.Fail()
+	}
+}
+
+func TestLegacyPluginUnknown(t *testing.T) {
+	status := internal.NewCsiPluginCheck(legacyClient(), "gluster-csi-plugin", "non-existing-plugin").DoCheck()
+
+	if status != 2 {
 		t.Fail()
 	}
 }
