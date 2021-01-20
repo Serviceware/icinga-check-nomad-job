@@ -1,61 +1,47 @@
 package internal
 
 import (
-	"fmt"
 	nomad "github.com/hashicorp/nomad/api"
 	"strconv"
 	"strings"
 )
 
-type CsiPluginCheck struct {
-	client *nomad.Client
-	job    string
-	plugin string
+type CheckCsiPluginOpts struct {
+	Job                    string `short:"j" long:"job" description:"Job to check"`
+	Plugin                 string `short:"p" long:"plugin" description:"Plugin to check"`
+	UnhealthyNodesWarning  int    `short:"w" long:"unhealthyNodesWarning" default:"0"" description:"Number of nodes which can be unhealthy until check returns warning"`
+	UnhealthyNodesCritical int    `short:"c" long:"unhealthyNodesCritical" default:"0" description:"Number of nodes which can be unhealthy until check returns critical"`
 }
 
-func NewCsiPluginCheck(client *nomad.Client, job string, plugin string) Check {
-	return &CsiPluginCheck{client: client, job: job, plugin: plugin}
-}
-
-func (c *CsiPluginCheck) DoCheck() int {
-	pluginInfo, _, err := c.client.CSIPlugins().Info(c.plugin, &nomad.QueryOptions{})
+func CheckCsiPlugin(client *nomad.Client, opts *CheckCsiPluginOpts) int {
+	pluginInfo, _, err := client.CSIPlugins().Info(opts.Plugin, &nomad.QueryOptions{})
 
 	if err != nil {
 		if strings.Contains(err.Error(), "404") {
-			println("plugin '", c.plugin, "' not found")
-			return 2
+			println("plugin '", opts.Plugin, "' not found")
+			return CRITICAL
 		}
 
 		println(err.Error())
-		return 3
+		return UNKNOWN
 	}
 
-	c.printPluginStatus(pluginInfo)
-	return c.determineStatus(pluginInfo)
-}
+	code := OK
 
-func (c *CsiPluginCheck) determineStatus(pluginInfo *nomad.CSIPlugin) int {
-	if pluginInfo.NodesHealthy == 0 {
-		return 2
-	}
-
-	if pluginInfo.NodesExpected != pluginInfo.NodesHealthy {
-		return 1
-	}
-
-	return 0
-}
-
-func (c *CsiPluginCheck) printPluginStatus(pluginInfo *nomad.CSIPlugin) {
-	healthyNodes := strconv.Itoa(pluginInfo.NodesHealthy)
-	expectedNodes := strconv.Itoa(pluginInfo.NodesExpected)
-	println(healthyNodes + " out of " + expectedNodes + " nodes available")
+	healthyNodes := pluginInfo.NodesHealthy
+	expectedNodes := pluginInfo.NodesExpected
+	unhealthyNodes := expectedNodes - healthyNodes
+	println(strconv.Itoa(healthyNodes) + " out of " + strconv.Itoa(expectedNodes) + " nodes available")
 	println()
-	println(c.createJobLink())
-}
+	println(createJobLink(client.Address(), opts.Job))
 
-func (c *CsiPluginCheck) createJobLink() string {
-	link := fmt.Sprintf("%s/ui/jobs/%s", c.client.Address(), c.job)
+	if unhealthyNodes > opts.UnhealthyNodesWarning {
+		code = WARNING
+	}
 
-	return "<a href=\"" + link + "\" target=\"_blank\">" + link + "</a>"
+	if unhealthyNodes > opts.UnhealthyNodesCritical {
+		code = CRITICAL
+	}
+
+	return code
 }

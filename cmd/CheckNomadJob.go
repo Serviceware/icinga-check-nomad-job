@@ -9,41 +9,44 @@ import (
 )
 
 var opts struct {
-	Address string `long:"address" description:"Address of the nomad server"`
+	Address string `long:"address" description:"Address of the nomad server" group:"connection"`
 
-	CaCert     string `long:"ca" description:"Path to ca cert"`
-	ClientCert string `long:"cert" description:"Path to client cert"`
-	ClientKey  string `long:"key" description:"Path to client key"`
+	CaCert     string `long:"ca" description:"Path to ca cert" group:"connection"`
+	ClientCert string `long:"cert" description:"Path to client cert" group:"connection"`
+	ClientKey  string `long:"key" description:"Path to client key" group:"connection"`
 
-	Job     string `short:"j" long:"job" description:"Job to check"`
-	JobType string `short:"t" long:"type" description:"Type of the job (service, csi-plugin)"`
-	Plugin  string `short:"p" long:"plugin" description:"The plugin to check"`
+	Service   internal.CheckServiceOpts   `command:"service" description:"Checks a service"`
+	CsiPlugin internal.CheckCsiPluginOpts `command:"csi-plugin" description:"Checks a csi plugin"`
 }
 
 func main() {
-	parseFlags()
+	parser := parseFlags()
 
-	exitCode := 3
-	switch opts.JobType {
+	exitCode := internal.CRITICAL
+	switch parser.Active.Name {
 	case "service":
-		exitCode = internal.NewServiceCheck(nomadClient(), opts.Job).DoCheck()
+		exitCode = internal.CheckService(nomadClient(), &opts.Service)
 	case "csi-plugin":
-		exitCode = internal.NewCsiPluginCheck(nomadClient(), opts.Job, opts.Plugin).DoCheck()
-	default:
-		println("job type '", opts.JobType, "' not supported")
+		exitCode = internal.CheckCsiPlugin(nomadClient(), &opts.CsiPlugin)
 	}
 
 	os.Exit(exitCode)
 }
 
-func parseFlags() {
-	_, err := flags.Parse(&opts)
+// Parses the command line
+func parseFlags() *flags.Parser {
+	p := flags.NewParser(opts, flags.Default)
+	_, err := p.Parse()
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	return p
 }
 
+
+// Creates a Nomad client from the given opts
 func nomadClient() *nomad.Client {
 	tlsConfig := &nomad.TLSConfig{
 		CACert:     opts.CaCert,
