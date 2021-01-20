@@ -47,11 +47,16 @@ func parseFlags() *flags.Parser {
 
 // Creates a Nomad client from the given opts
 func nomadClient() *nomad.Client {
-	tlsConfig := &nomad.TLSConfig{
-		CACert:     opts.CaCert,
-		ClientCert: opts.ClientCert,
-		ClientKey:  opts.ClientKey,
-		Insecure:   false,
+	var tlsConfig *nomad.TLSConfig
+
+	if opts.ClientCert != "" {
+		tlsConfig = &nomad.TLSConfig{
+			CACert:     opts.CaCert,
+			ClientCert: opts.ClientCert,
+			ClientKey:  opts.ClientKey,
+			Insecure:   false,
+		}
+
 	}
 
 	config := &nomad.Config{Address: opts.Address, TLSConfig: tlsConfig}
