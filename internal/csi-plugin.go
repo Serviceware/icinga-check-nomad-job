@@ -9,10 +9,11 @@ import (
 type CheckCsiPluginOpts struct {
 	Job                    string `short:"j" long:"job" description:"Job to check"`
 	Plugin                 string `short:"p" long:"plugin" description:"Plugin to check"`
-	UnhealthyNodesWarning  int    `short:"w" long:"unhealthyNodesWarning" default:"0"" description:"Number of nodes which can be unhealthy until check returns warning"`
-	UnhealthyNodesCritical int    `short:"c" long:"unhealthyNodesCritical" default:"0" description:"Number of nodes which can be unhealthy until check returns critical"`
+	UnhealthyNodesWarning  int    `short:"w" long:"unhealthy-nodes-warning" default:"0" description:"Number of nodes which can be unhealthy until check returns warning"`
+	UnhealthyNodesCritical int    `short:"c" long:"unhealthy-nodes-critical" default:"0" description:"Number of nodes which can be unhealthy until check returns critical"`
 }
 
+// Check if csi plugin is running on expected number of nodes
 func CheckCsiPlugin(client *nomad.Client, opts *CheckCsiPluginOpts) int {
 	pluginInfo, _, err := client.CSIPlugins().Info(opts.Plugin, &nomad.QueryOptions{})
 

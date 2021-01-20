@@ -45,7 +45,6 @@ func parseFlags() *flags.Parser {
 	return p
 }
 
-
 // Creates a Nomad client from the given opts
 func nomadClient() *nomad.Client {
 	tlsConfig := &nomad.TLSConfig{
