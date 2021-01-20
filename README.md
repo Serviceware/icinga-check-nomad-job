@@ -14,15 +14,22 @@ the [Check](internal/check.go) interface in the internal package. The check dete
 ## Build
 
 ```shell
-go build -o check_nomad_job cmd/CheckNomadJob.go
+go build -o check-nomad-job cmd/CheckNomadJob.go
 ```
 
-## Testing
+## Checks
 
-To run local tests against one of our Nomad cluster (patty, greta, legacy)
+### Service
 
-* create certs: `make certs`
-* run tests: `go test -v ./test`
+```shell
+check-nomad-job service --job redis
+```
+
+### CSI Plugin
+
+```shell
+check-nomad-job csi-plugin --job gluster --plugin csi.gluster
+```
 
 ## Icinga config
 
