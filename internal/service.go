@@ -7,7 +7,7 @@ import (
 )
 
 type CheckServiceOpts struct {
-	Job string `long:"job"' short:"j" description:"The job to check"`
+	Job string `long:"job" short:"j" description:"The job to check"`
 }
 
 // Checks if the given job is running and if it has unhealthy allocation.
@@ -54,6 +54,3 @@ func CheckService(client *nomad.Client, opts *CheckServiceOpts) int {
 
 	return code
 }
-
-
-

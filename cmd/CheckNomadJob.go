@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-var opts struct {
-	Address string `long:"address" description:"Address of the nomad server" group:"connection"`
+type args struct {
+	Address string `long:"address" description:"Address of the nomad server" group:"connection" default:"http://localhost:4646"`
 
 	CaCert     string `long:"ca" description:"Path to ca cert" group:"connection"`
 	ClientCert string `long:"cert" description:"Path to client cert" group:"connection"`
@@ -18,6 +18,8 @@ var opts struct {
 	Service   internal.CheckServiceOpts   `command:"service" description:"Checks a service"`
 	CsiPlugin internal.CheckCsiPluginOpts `command:"csi-plugin" description:"Checks a csi plugin"`
 }
+
+var opts = new(args)
 
 func main() {
 	parser := parseFlags()
