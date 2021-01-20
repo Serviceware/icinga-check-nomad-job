@@ -30,18 +30,18 @@ func CheckService(client *nomad.Client, opts *CheckServiceOpts) int {
 		deployment = &nomad.Deployment{}
 	}
 
-	code := OK
+	status := OK
 	println("status=" + *jobInfo.Status)
 
 	if *jobInfo.Status != "running" {
-		code = CRITICAL
+		status = CRITICAL
 	}
 
 	for key, value := range deployment.TaskGroups {
 		println(key + ".unhealthyAllocs=" + strconv.Itoa(value.UnhealthyAllocs))
 
 		if value.UnhealthyAllocs > 0 {
-			code = CRITICAL
+			status = CRITICAL
 		}
 	}
 
@@ -52,5 +52,5 @@ func CheckService(client *nomad.Client, opts *CheckServiceOpts) int {
 		}
 	}
 
-	return code
+	return status
 }

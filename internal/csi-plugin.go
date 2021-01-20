@@ -27,7 +27,7 @@ func CheckCsiPlugin(client *nomad.Client, opts *CheckCsiPluginOpts) int {
 		return UNKNOWN
 	}
 
-	code := OK
+	status := OK
 
 	healthyNodes := pluginInfo.NodesHealthy
 	expectedNodes := pluginInfo.NodesExpected
@@ -37,12 +37,12 @@ func CheckCsiPlugin(client *nomad.Client, opts *CheckCsiPluginOpts) int {
 	println(createJobLink(client.Address(), opts.Job))
 
 	if unhealthyNodes > opts.UnhealthyNodesWarning {
-		code = WARNING
+		status = WARNING
 	}
 
 	if unhealthyNodes > opts.UnhealthyNodesCritical {
-		code = CRITICAL
+		status = CRITICAL
 	}
 
-	return code
+	return status
 }
