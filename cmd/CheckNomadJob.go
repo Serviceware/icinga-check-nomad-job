@@ -24,7 +24,7 @@ var opts = new(args)
 func main() {
 	parser := parseFlags()
 
-	exitCode := internal.CRITICAL
+	exitCode := internal.UNKNOWN
 	switch parser.Active.Name {
 	case "service":
 		exitCode = internal.CheckService(nomadClient(), &opts.Service)
@@ -32,7 +32,7 @@ func main() {
 		exitCode = internal.CheckCsiPlugin(nomadClient(), &opts.CsiPlugin)
 	}
 
-	os.Exit(exitCode)
+	os.Exit(int(exitCode))
 }
 
 // Parses the command line

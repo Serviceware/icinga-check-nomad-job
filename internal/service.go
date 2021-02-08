@@ -11,7 +11,7 @@ type CheckServiceOpts struct {
 }
 
 // Checks if the given job is running and if it has unhealthy allocation.
-func CheckService(client *nomad.Client, opts *CheckServiceOpts) int {
+func CheckService(client *nomad.Client, opts *CheckServiceOpts) Status {
 	jobInfo, _, err := client.Jobs().Info(opts.Job, &nomad.QueryOptions{})
 
 	if err != nil {

@@ -14,7 +14,7 @@ type CheckCsiPluginOpts struct {
 }
 
 // Check if csi plugin is running on expected number of nodes
-func CheckCsiPlugin(client *nomad.Client, opts *CheckCsiPluginOpts) int {
+func CheckCsiPlugin(client *nomad.Client, opts *CheckCsiPluginOpts) Status {
 	pluginInfo, _, err := client.CSIPlugins().Info(opts.Plugin, &nomad.QueryOptions{})
 
 	if err != nil {
