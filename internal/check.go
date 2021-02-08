@@ -4,12 +4,22 @@ import (
 	"fmt"
 )
 
+type Status uint
+
 const (
-	OK       = 0
-	WARNING  = 1
-	CRITICAL = 2
-	UNKNOWN  = 3
+	OK       Status = 0
+	WARNING  Status = 1
+	CRITICAL Status = 2
+	UNKNOWN  Status = 3
 )
+
+func (s Status) Max(other Status) Status {
+	if s > other {
+		return s
+	} else {
+		return other
+	}
+}
 
 func createJobLink(address string, job string) string {
 	link := fmt.Sprintf("%s/ui/jobs/%s", address, job)
