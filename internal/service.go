@@ -24,6 +24,7 @@ func CheckService(client *nomad.Client, opts *CheckServiceOpts) Status {
 		return UNKNOWN
 	}
 
+	summary, _, _ := client.Jobs().Summary(*jobInfo.ID, nil)
 	deployment, _, _ := client.Jobs().LatestDeployment(*jobInfo.ID, &nomad.QueryOptions{})
 
 	if deployment == nil {
@@ -38,11 +39,16 @@ func CheckService(client *nomad.Client, opts *CheckServiceOpts) Status {
 	}
 
 	for key, value := range deployment.TaskGroups {
-		println(key + ".unhealthyAllocs=" + strconv.Itoa(value.UnhealthyAllocs))
+		running := summary.Summary[key].Running
+		desired := value.DesiredTotal
 
-		if value.UnhealthyAllocs > 0 {
+		if running < desired {
+			println(key+".summary.running="+strconv.Itoa(running), "<", key+".desiredTotal="+strconv.Itoa(desired))
 			status = CRITICAL
+		} else {
+			println(key+".summary.running="+strconv.Itoa(running), ">=", key+".desiredTotal="+strconv.Itoa(desired))
 		}
+
 	}
 
 	println(createJobLink(client.Address(), *jobInfo.ID))
