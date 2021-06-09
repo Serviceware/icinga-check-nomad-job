@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/sabio-it/icinga-check-nomad-job/internal"
+	"github.com/Serviceware/icinga-check-nomad-job/internal"
 	nomad "github.com/hashicorp/nomad/api"
 	"github.com/jessevdk/go-flags"
 	"log"

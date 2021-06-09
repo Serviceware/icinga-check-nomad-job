@@ -7,7 +7,8 @@ import (
 )
 
 type CheckServiceOpts struct {
-	Job string `long:"job" short:"j" description:"The job to check"`
+	Job  string `long:"job" short:"j" description:"The job to check"`
+	Type string `long:"type" short:"t" default:"service" description:"Expected type of the job"`
 }
 
 // Checks if the given job is running and if it has unhealthy allocation.
@@ -35,6 +36,11 @@ func CheckService(client *nomad.Client, opts *CheckServiceOpts) Status {
 	println("status=" + *jobInfo.Status)
 
 	if *jobInfo.Status != "running" {
+		status = CRITICAL
+	}
+
+	if *jobInfo.Type != opts.Type {
+		println("type is not '" + opts.Type + "'")
 		status = CRITICAL
 	}
 

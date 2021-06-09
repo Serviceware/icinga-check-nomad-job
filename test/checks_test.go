@@ -1,7 +1,7 @@
 package test
 
 import (
-	"bitbucket.org/sabio-it/icinga-check-nomad-job/internal"
+	"github.com/Serviceware/icinga-check-nomad-job/internal"
 	nomad "github.com/hashicorp/nomad/api"
 	"log"
 	"testing"
@@ -18,8 +18,16 @@ func client() *nomad.Client {
 	return client
 }
 
-func Test(t *testing.T) {
-	status := internal.CheckService(client(), &internal.CheckServiceOpts{Job: "example"})
+func TestService(t *testing.T) {
+	status := internal.CheckService(client(), &internal.CheckServiceOpts{Job: "production-capi-standalone-sokadach"})
+
+	if status != internal.OK {
+		t.Fail()
+	}
+}
+
+func TestSystem(t *testing.T) {
+	status := internal.CheckService(client(), &internal.CheckServiceOpts{Job: "swops-production-suricata-fsn", Type: "system"})
 
 	if status != internal.OK {
 		t.Fail()
